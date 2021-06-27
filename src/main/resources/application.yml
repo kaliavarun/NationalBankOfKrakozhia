@@ -1,0 +1,60 @@
+logging:
+  file:
+    name: logs/national-bank-of-krakozhia.log
+  level:
+    org.hibernate: TRACE
+    org.hibernate.SQL: TRACE
+    org.hibernate.type: TRACE
+    org.springframework:
+      batch: WARN
+      beans: ERROR
+      cloud: ERROR
+      jdbc: TRACE
+      web: ERROR
+  logback:
+    rollingpolicy:
+      max-history: 30
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger.%M - %msg%n"
+    file: "%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n"
+server:
+  max-http-header-size: 10000000
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+spring:
+  banner:
+    location: "classpath:banner.txt"
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true
+      secrets.enabled: true
+  datasource:
+    url: jdbc:h2:mem:nationalbankofkrakozhiadb
+    username: sa
+    password: sa
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  h2:
+    console:
+      enabled: true
+      path: /h2db
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        type: true
+        use_sql_comments: true
+  web:
+    locale: en
