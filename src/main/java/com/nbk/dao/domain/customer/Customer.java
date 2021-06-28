@@ -1,18 +1,19 @@
 package com.nbk.dao.domain.customer;
 
-import lombok.Getter;
+import com.nbk.dao.domain.account.Account;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
-@NoArgsConstructor
-@Setter
-@Getter
 @Entity
 @Table(name = "T_CUSTOMER")
+@Data
+@NoArgsConstructor
 public class Customer implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -28,4 +29,8 @@ public class Customer implements Serializable {
   @Column(name = "CUSTOMER_SURNAME", nullable = false)
   @NonNull
   private String surname;
+
+  @OneToMany(fetch = FetchType.EAGER)
+  @JoinColumn(name = "CUSTOMER_ID")
+  private Set<Account> accounts = new HashSet<Account>();
 }

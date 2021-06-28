@@ -3,19 +3,26 @@ package com.nbk.dao.domain.account;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Collection;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-@MappedSuperclass
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "CUSTOMER_ID")
+@Entity
+@Table(name = "T_ACCOUNT")
 @Data
-public abstract class Account {
+public class Account implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "ACCOUNT_ID", nullable = false, unique = true)
   private Long accountId;
+
+  @Column(name = "ACCOUNT_TYPE", nullable = false)
+  private AccountTypeEnum accountType;
 
   @Column(name = "CUSTOMER_ID", nullable = false)
   private Long customerId;
@@ -23,6 +30,7 @@ public abstract class Account {
   @Column(name = "ACCOUNT_NUMBER", nullable = false, unique = true)
   private Long accountNumber;
 
-  @Column(name = "ACCOUNT_BALANCE", nullable = false)
-  private BigDecimal accountBalance;
+  @OneToMany(fetch = FetchType.EAGER)
+  @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
+  private List<Transaction> transactions = new ArrayList<>();
 }

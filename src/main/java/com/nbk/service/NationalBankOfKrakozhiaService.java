@@ -1,7 +1,9 @@
 package com.nbk.service;
 
+import com.nbk.dao.domain.account.Account;
 import com.nbk.dao.domain.account.Transaction;
-import com.nbk.dao.domain.account.TransactionType;
+import com.nbk.dao.domain.account.TransactionTypeEnum;
+import com.nbk.dao.domain.customer.Customer;
 import com.nbk.dto.AccountDTO;
 import com.nbk.exception.NationalBankOfKrakozhiaException;
 import lombok.NonNull;
@@ -34,24 +36,36 @@ public class NationalBankOfKrakozhiaService {
    * @return accountDTO After account creation
    */
   public AccountDTO createAccount(@NonNull AccountDTO accountDTO) {
-    //1. Check if valid customer
-    customerService
+    // 1. Check if valid customer
+    this.customerService
         .findById(accountDTO.getCustomerId())
         .orElseThrow(() -> new NationalBankOfKrakozhiaException("No customer found!"));
 
-    //2. Create account.
-    accountDTO = accountService.createAccount(accountDTO);
+    // 2. Create account.
+    Account account = this.accountService.createAccount(accountDTO);
 
-    //3. Create transaction in new account if initial credit is not null
-    if( Objects.nonNull(accountDTO.getInitialCredit())){
+    // 3. Create transaction in new account if initial credit is not null
+    if (Objects.nonNull(accountDTO.getInitialCredit())) {
 
       Transaction transaction = new Transaction();
       transaction.setTransactionAmount(accountDTO.getInitialCredit());
-      transaction.setTransactionType(TransactionType.CREDIT); // by default only credit is implemented
-      //transaction.setTransactionAccountId(accountDTO.get);
-      //transactionService.
+      transaction.setTransactionType(
+          TransactionTypeEnum.CREDIT); // by default only credit is implemented
+      transaction.setTransactionAccountId(account.getAccountId());
+
+      this.transactionService.createTransaction(transaction);
     }
 
+    accountDTO.setAccountNumber(account.getAccountNumber());
+
     return accountDTO;
+  }
+
+  public Customer createCustomer(@NonNull Customer customer) {
+    return customerService.createCustomer(customer);
+  }
+
+  public Customer findCustomerById(Long id) {
+    return customerService.findById(id).orElse(null);
   }
 }

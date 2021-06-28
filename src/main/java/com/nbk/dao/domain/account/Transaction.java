@@ -26,8 +26,7 @@ public class Transaction implements Serializable {
   private Long transactionAccountId;
 
   @Column(name = "TRANSACTION_TYPE", nullable = false)
-  @Enumerated(EnumType.STRING)
-  private TransactionType transactionType;
+  private TransactionTypeEnum transactionType;
 
   @Column(name = "TRANSACTION_AMMOUNT", nullable = false)
   private BigDecimal transactionAmount;

@@ -18,7 +18,7 @@ public class TransactionService {
     this.transactionRepository = transactionRepository;
   }
 
-  public void createTransaction(Transaction transaction) {
-    transactionRepository.save(transaction);
+  public Transaction createTransaction(Transaction transaction) {
+    return transactionRepository.save(transaction);
   }
 }

@@ -1,10 +1,8 @@
 package com.nbk.service;
 
 import com.nbk.dao.domain.account.Account;
-import com.nbk.dao.domain.account.CurrentAccount;
-import com.nbk.dao.domain.account.SavingsAccount;
-import com.nbk.dao.repository.CurrentAccountRepository;
-import com.nbk.dao.repository.SavingsAccountRepository;
+import com.nbk.dao.domain.account.AccountTypeEnum;
+import com.nbk.dao.repository.AccountRepository;
 import com.nbk.dto.AccountDTO;
 import com.nbk.exception.NationalBankOfKrakozhiaException;
 import lombok.NonNull;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
@@ -23,52 +20,43 @@ public class AccountService {
   final long MAX_ACCOUNT_NUMBER_VALUE = 9999999999999999L;
   final long MIN_ACCOUNT_NUMBER_VALUE = 1000000000000000L;
 
-  private final SavingsAccountRepository savingsAccountRepository;
-  private final CurrentAccountRepository currentAccountRepository;
+  private final AccountRepository accountRepository;
 
   @Autowired
-  public AccountService(
-      SavingsAccountRepository savingsAccountRepository,
-      CurrentAccountRepository currentAccountRepository) {
-    this.savingsAccountRepository = savingsAccountRepository;
-    this.currentAccountRepository = currentAccountRepository;
+  public AccountService(AccountRepository accountRepository) {
+    this.accountRepository = accountRepository;
   }
 
-  public AccountDTO createAccount(@NonNull AccountDTO accountDTO) {
+  public Account createAccount(@NonNull AccountDTO accountDTO) {
     // Can be replaced with factory pattern if this is a composite service
     // containing other services.
+    Account account = new Account();
+    account.setCustomerId(accountDTO.getCustomerId());
+    account.setAccountNumber(accountNumberGenerator());
+
     switch (accountDTO.getAccountType()) {
       case "CURRENT":
-        CurrentAccount currentAccount = new CurrentAccount();
-        currentAccount.setCurrentAccountYear(LocalDate.now().getYear());
-        currentAccount.setAccountBalance(accountDTO.getInitialCredit());
-        currentAccount.setCustomerId(accountDTO.getCustomerId());
-        currentAccount.setAccountNumber(accountNumberGenerator());
-
-        currentAccountRepository.save(currentAccount);
-
-        accountDTO.setAccountNumber(currentAccount.getAccountNumber());
+        account.setAccountType(AccountTypeEnum.CURRENT);
         break;
-      case "SAVING":
-        SavingsAccount savingsAccount = new SavingsAccount();
-        savingsAccount.setAccountBalance(accountDTO.getInitialCredit());
-        savingsAccount.setCustomerId(accountDTO.getCustomerId());
-        savingsAccount.setAccountNumber(accountNumberGenerator());
-
-        savingsAccountRepository.save(savingsAccount);
-
-        accountDTO.setAccountNumber(savingsAccount.getAccountNumber());
+      case "SAVINGS":
+        account.setAccountType(AccountTypeEnum.SAVINGS);
         break;
       default:
         throw new NationalBankOfKrakozhiaException("Invalid Account Type");
     }
-    return accountDTO;
+
+    return accountRepository.save(account);
   }
 
-  public List<Account> findAccountsByCustomerId(@NonNull Long customerId){
+  public List<Account> findAccountsByCustomerId(@NonNull Long customerId) {
     return null;
   }
 
+  /**
+   * To be generated using database in real
+   *
+   * @return Random account number
+   */
   private Long accountNumberGenerator() {
     return Math.abs(
         Float.valueOf(
