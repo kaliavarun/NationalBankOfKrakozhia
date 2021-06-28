@@ -5,9 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "T_ACCOUNT")
@@ -32,5 +30,5 @@ public class Account implements Serializable {
 
   @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
-  private List<Transaction> transactions = new ArrayList<>();
+  private List<Transaction> transactions = new ArrayList<Transaction>();
 }
