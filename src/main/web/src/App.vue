@@ -1,7 +1,8 @@
 <template>
   <div class="app-example container">
+    <!-- Create account -->
     <div class="row justify-content-center">
-      <div class="col-md-6" data-target="toggle.grid">
+      <div class="col-md-7" data-target="toggle.grid">
         <div class="card border-bootstrap box-shadow mb-4">
           <div
             class="
@@ -17,13 +18,14 @@
             </div>
           </div>
           <div class="card-body">
-            <form class="needs-validation" novalidate="">
+            <form @submit.prevent class="needs-validation" novalidate="">
               <div class="alert alert-danger d-none">
                 Please review the problems below:
               </div>
 
               <div class="form-floating mb-3">
                 <input
+                  v-model="customerId"
                   type="text"
                   class="form-control"
                   id="customerId"
@@ -42,10 +44,19 @@
               </div>
 
               <div class="form-floating mb-3">
-                <select class="form-select" id="selectAccountTypes" required="">
-                  <option value="">Select Account Type</option>
-                  <option value="savings">Savings</option>
-                  <option value="current">Current</option>
+                <select
+                  class="form-select"
+                  id="selectAccountTypes"
+                  required=""
+                  v-model="selectedAccount"
+                >
+                  <option
+                    v-for="(acc, key) in accountTypes"
+                    :value="key"
+                    :key="key"
+                  >
+                    {{ acc }}
+                  </option>
                 </select>
                 <label for="selectAccountTypes">Account Type</label>
                 <div class="invalid-feedback">
@@ -56,6 +67,7 @@
 
               <div class="form-floating mb-3">
                 <input
+                  v-model="initialCredit"
                   type="text"
                   class="form-control"
                   id="inputAmount"
@@ -70,10 +82,17 @@
                 <div class="valid-feedback">Looks good!</div>
               </div>
               <div class="col text-center">
-                <button type="submit" class="btn btn-primary">
+                <button @click="createAccount()" class="btn btn-primary">
                   Create Account
                 </button>
-                <button type="reset" class="btn btn-primary">Reset</button>
+                <button @click="resetForm()" class="btn btn-primary">
+                  Reset
+                </button>
+                <div class="acc-success">
+                  <span v-show="isAccountCreated" class="badge alert-success"
+                    >Account Created</span
+                  >
+                </div>
               </div>
             </form>
           </div>
@@ -82,7 +101,7 @@
     </div>
     <!-- View Details -->
     <div class="row justify-content-center">
-      <div class="col-md-6" data-target="toggle.grid">
+      <div class="col-md-7" data-target="toggle.grid">
         <div class="card border-bootstrap box-shadow mb-4">
           <div
             class="
@@ -135,7 +154,9 @@
                   </button>
                 </div>
                 <div class="row">
-                  <table class="table table-striped table-hover table-condensed">
+                  <table
+                    class="table table-striped table-hover table-condensed"
+                  >
                     <thead>
                       <tr>
                         <th scope="col">Id</th>
@@ -153,7 +174,9 @@
                   </table>
                 </div>
                 <div class="row">
-                  <table class="table table-striped table-hover table-condensed">
+                  <table
+                    class="table table-striped table-hover table-condensed"
+                  >
                     <thead>
                       <tr>
                         <th scope="col">Account Number</th>
@@ -176,7 +199,9 @@
                   </table>
                 </div>
                 <div class="row">
-                  <table class="table table-striped table-hover table-condensed">
+                  <table
+                    class="table table-striped table-hover table-condensed"
+                  >
                     <thead>
                       <tr>
                         <th scope="col">Transaction Id</th>
@@ -207,6 +232,53 @@
 <script>
 export default {
   name: "App",
+  data() {
+    return {
+      customerId: "",
+      accountTypes: ["SAVINGS", "CURRENT"],
+      selectedAccount: "",
+      initialCredit: "",
+      isAccountCreated: false,
+    };
+  },
+  methods: {
+    createAccount() {
+      console.log("This is test");
+      console.log(this.customerId);
+      console.log(this.initialCredit);
+      console.log("Seelcted account is " + this.selectedAccount);
+
+      fetch("/api/account/create", {
+        method: "post",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerId: this.customerId,
+          initialCredit: this.initialCredit,
+          accountType: this.accountTypes[this.selectedAccount],
+        }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            this.isAccountCreated = true;
+            return response.json();
+          } else {
+            throw new Error("Something went wrong");
+          }
+        })
+        .catch((error) => {
+          this.isAccountCreated = false;
+          console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFFFF" + error);
+        });
+    },
+    resetForm() {
+      this.customerId = "";
+      this.initialCredit = "";
+      this.isAccountCreated = false;
+    },
+  },
 };
 </script>
 <style scoped>
@@ -219,7 +291,10 @@ export default {
 #viewdetails {
   margin-top: 0.7rem;
 }
-.table-condensed{
+.table-condensed {
   font-size: 11px;
+}
+.acc-success {
+  margin-top: 2rem;
 }
 </style>

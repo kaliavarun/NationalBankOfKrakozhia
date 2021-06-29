@@ -10,7 +10,7 @@ logging:
       beans: ERROR
       cloud: ERROR
       jdbc: TRACE
-      web: ERROR
+      web: TRACE
   logback:
     rollingpolicy:
       max-history: 30
@@ -19,7 +19,7 @@ logging:
     file: "%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n"
 server:
   max-http-header-size: 10000000
-  port: 8080
+  port: 8081
   servlet:
     encoding:
       charset: UTF-8
