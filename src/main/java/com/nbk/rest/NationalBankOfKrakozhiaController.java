@@ -8,10 +8,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
+
 @RestController
 public class NationalBankOfKrakozhiaController {
 
-  @Autowired private NationalBankOfKrakozhiaService service;
+  private final NationalBankOfKrakozhiaService service;
+
+  @Autowired
+  public NationalBankOfKrakozhiaController(NationalBankOfKrakozhiaService service) {
+    this.service = service;
+  }
 
   @PostMapping("/customer/create")
   public ResponseEntity<Customer> createCustomer(@RequestBody @Valid Customer customer) {
@@ -20,7 +27,13 @@ public class NationalBankOfKrakozhiaController {
 
   @GetMapping("/customer/{id}")
   public ResponseEntity<Customer> getCustomer(@Valid @PathVariable("id") Long id) {
-    return ResponseEntity.ok().body(service.findCustomerById(id));
+    Customer customer = service.findCustomerById(id);
+    if (Objects.nonNull(customer)){
+      return ResponseEntity.ok().body(service.findCustomerById(id));
+    }
+    else{
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @PostMapping("/account/create")

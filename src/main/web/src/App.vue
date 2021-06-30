@@ -48,7 +48,7 @@
                   class="form-select"
                   id="selectAccountTypes"
                   required=""
-                  v-model="selectedAccount"
+                  v-model="selectedAccountType"
                 >
                   <option
                     v-for="(acc, key) in accountTypes"
@@ -156,9 +156,7 @@
                   </button>
                 </div>
                 <!-- Customer Details -->
-                <div
-                  v-if="customerDetails"
-                >
+                <div v-if="customerDetails">
                   <div class="row">
                     <table
                       class="table table-striped table-hover table-condensed"
@@ -172,36 +170,37 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <th scope="row">{{customerDetails.id}}</th>
-                          <td>{{customerDetails.name}}</td>
-                          <td>{{customerDetails.surname}}</td>
+                          <th scope="row">{{ customerDetails.id }}</th>
+                          <td>{{ customerDetails.name }}</td>
+                          <td>{{ customerDetails.surname }}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                  <!-- Customer Account Details -->
-                  <div class="row">
-                    <table
-                      class="table table-striped table-hover table-condensed"
+                  <!--Select Account to view transactions -->
+                  <div class="form-floating mb-5">
+                    <select
+                      @change="onAccountSelect($event)"
+                      class="form-select"
+                      id="selectAccount"
+                      required=""
                     >
-                      <thead>
-                        <tr>
-                          <th scope="col">Account Number</th>
-                          <th scope="col">Account Type</th>
-                          <th scope="col">Account Balance(€)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(account, key) in customerDetails.accounts"
-                          :key="key">
-                          <th scope="row">{{account.accountNumber}}</th>
-                          <td>{{account.accountType}}</td>
-                          <td>100000</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                      <option
+                        v-for="(acc, key) in customerDetails.accounts"
+                        :value="key"
+                        :key="key"
+                      >
+                        {{ acc.accountNumber }}
+                      </option>
+                    </select>
+                    <label for="selectAccount">-Select Account-</label>
+                    <div class="invalid-feedback">
+                      Please provide a valid value.
+                    </div>
+                    <div class="valid-feedback">Looks good!</div>
                   </div>
                   <!-- Customer Account Transaction Details -->
+                  <div v-if="transactions">
                   <div class="row">
                     <table
                       class="table table-striped table-hover table-condensed"
@@ -209,20 +208,22 @@
                       <thead>
                         <tr>
                           <th scope="col">Trans. Id</th>
-                          <th scope="col">Acc Number</th>
                           <th scope="col">Trans. Type</th>
                           <th scope="col">Trans. Amount</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="(transaction, key) in transactions" :key="key">
-                          <th scope="row">{{transaction.transactionId}}</th>
-                          <td>{{transaction.transactionAccountId}}</td>
-                          <td>{{transaction.transactionType}}</td>
-                          <td>{{transaction.transactionAmount}}</td>
+                        <tr
+                          v-for="(transaction, key) in transactions"
+                          :key="key"
+                        >
+                          <th scope="row">{{ transaction.transactionId }}</th>
+                          <td>{{ transaction.transactionType }}</td>
+                          <td>{{ transaction.transactionAmount }}</td>
                         </tr>
                       </tbody>
                     </table>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -241,12 +242,13 @@ export default {
     return {
       customerId: "",
       accountTypes: ["SAVINGS", "CURRENT"],
+      selectedAccountType: "",
       selectedAccount: "",
       initialCredit: "",
       isAccountCreated: false,
       accountNumber: "",
       customerDetails: "",
-      transactions: []
+      transactions: [],
     };
   },
   methods: {
@@ -260,7 +262,7 @@ export default {
         body: JSON.stringify({
           customerId: this.customerId,
           initialCredit: this.initialCredit,
-          accountType: this.accountTypes[this.selectedAccount],
+          accountType: this.accountTypes[this.selectedAccountType],
         }),
       })
         .then((response) => {
@@ -291,23 +293,27 @@ export default {
         })
         .then((customerDetails) => {
           this.customerDetails = customerDetails;
-          // Flatmap transactions
-          var trans = [];
-          this.customerDetails.accounts.forEach((obj) => {
-            trans= trans.concat(obj.transactions);
-          });
-          this.transactions = trans;
+          console.log(customerDetails)
         })
         .catch((error) => {
           this.customerDetails = "";
           console.log(error);
         });
     },
+    onAccountSelect(event){
+      console.log(event.target.value)
+      this.transactions = this.customerDetails.accounts[event.target.value].transactions
+      console.log('Set Trans is' + this.transactions)
+    },
     resetForm() {
       this.customerId = "";
       this.initialCredit = "";
       this.isAccountCreated = false;
-    },
+      this.selectedAccount = "";
+      this.initialCredit = "";
+      this.isAccountCreated = false;
+      this.transactions = []
+    }
   },
 };
 </script>
@@ -326,5 +332,8 @@ export default {
 }
 .acc-success {
   margin-top: 2rem;
+}
+.btn-group.accountType {
+  width: 400px;
 }
 </style>
