@@ -90,7 +90,7 @@
                 </button>
                 <div class="acc-success">
                   <span v-show="isAccountCreated" class="badge alert-success"
-                    >Account Created</span
+                    >Account Created: {{ accountNumber }}</span
                   >
                 </div>
               </div>
@@ -117,7 +117,7 @@
             </div>
           </div>
           <div class="card-body">
-            <form class="needs-validation" novalidate="">
+            <form @submit.prevent class="needs-validation" novalidate="">
               <div class="alert alert-danger d-none">
                 Please review the problems below:
               </div>
@@ -125,6 +125,7 @@
                 <div class="col-sm-6">
                   <div class="form-floating mb-3">
                     <input
+                      v-model="customerId"
                       type="text"
                       class="form-control"
                       id="customerId"
@@ -146,6 +147,7 @@
                 </div>
                 <div class="col-sm-6 text-center">
                   <button
+                    @click="viewCustomerDetails()"
                     type="submit"
                     class="btn btn-primary"
                     id="viewdetails"
@@ -153,72 +155,75 @@
                     View Details
                   </button>
                 </div>
-                <div class="row">
-                  <table
-                    class="table table-striped table-hover table-condensed"
-                  >
-                    <thead>
-                      <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">100000</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="row">
-                  <table
-                    class="table table-striped table-hover table-condensed"
-                  >
-                    <thead>
-                      <tr>
-                        <th scope="col">Account Number</th>
-                        <th scope="col">Account Type</th>
-                        <th scope="col">Account Balance(€)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">125458523659856247</th>
-                        <td>SAVINGS</td>
-                        <td>30000</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">458623523659856247</th>
-                        <td>CURRENT</td>
-                        <td>90000</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="row">
-                  <table
-                    class="table table-striped table-hover table-condensed"
-                  >
-                    <thead>
-                      <tr>
-                        <th scope="col">Transaction Id</th>
-                        <th scope="col">Account Number</th>
-                        <th scope="col">Transaction Type</th>
-                        <th scope="col">Transaction Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">100012</th>
-                        <td>125458523659856247</td>
-                        <td>CREDIT</td>
-                        <td>25000</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <!-- Customer Details -->
+                <div
+                  v-if="customerDetails"
+                >
+                  <div class="row">
+                    <table
+                      class="table table-striped table-hover table-condensed"
+                    >
+                      <thead>
+                        <tr>
+                          <th scope="col">Id</th>
+                          <th scope="col">First Name</th>
+                          <th scope="col">Last Name</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">{{customerDetails.id}}</th>
+                          <td>{{customerDetails.name}}</td>
+                          <td>{{customerDetails.surname}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- Customer Account Details -->
+                  <div class="row">
+                    <table
+                      class="table table-striped table-hover table-condensed"
+                    >
+                      <thead>
+                        <tr>
+                          <th scope="col">Account Number</th>
+                          <th scope="col">Account Type</th>
+                          <th scope="col">Account Balance(€)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(account, key) in customerDetails.accounts"
+                          :key="key">
+                          <th scope="row">{{account.accountNumber}}</th>
+                          <td>{{account.accountType}}</td>
+                          <td>100000</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- Customer Account Transaction Details -->
+                  <div class="row">
+                    <table
+                      class="table table-striped table-hover table-condensed"
+                    >
+                      <thead>
+                        <tr>
+                          <th scope="col">Trans. Id</th>
+                          <th scope="col">Acc Number</th>
+                          <th scope="col">Trans. Type</th>
+                          <th scope="col">Trans. Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(transaction, key) in transactions" :key="key">
+                          <th scope="row">{{transaction.transactionId}}</th>
+                          <td>{{transaction.transactionAccountId}}</td>
+                          <td>{{transaction.transactionType}}</td>
+                          <td>{{transaction.transactionAmount}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </form>
@@ -239,15 +244,13 @@ export default {
       selectedAccount: "",
       initialCredit: "",
       isAccountCreated: false,
+      accountNumber: "",
+      customerDetails: "",
+      transactions: []
     };
   },
   methods: {
     createAccount() {
-      console.log("This is test");
-      console.log(this.customerId);
-      console.log(this.initialCredit);
-      console.log("Seelcted account is " + this.selectedAccount);
-
       fetch("/api/account/create", {
         method: "post",
         headers: {
@@ -268,9 +271,36 @@ export default {
             throw new Error("Something went wrong");
           }
         })
+        .then((account) => {
+          this.accountNumber = account.accountNumber;
+          console.log(account);
+        })
         .catch((error) => {
           this.isAccountCreated = false;
-          console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFFFF" + error);
+          console.log(error);
+        });
+    },
+    viewCustomerDetails() {
+      fetch("/api/customer/" + this.customerId)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Something went wrong");
+          }
+        })
+        .then((customerDetails) => {
+          this.customerDetails = customerDetails;
+          // Flatmap transactions
+          var trans = [];
+          this.customerDetails.accounts.forEach((obj) => {
+            trans= trans.concat(obj.transactions);
+          });
+          this.transactions = trans;
+        })
+        .catch((error) => {
+          this.customerDetails = "";
+          console.log(error);
         });
     },
     resetForm() {
