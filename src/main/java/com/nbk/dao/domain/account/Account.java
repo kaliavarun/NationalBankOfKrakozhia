@@ -1,9 +1,13 @@
 package com.nbk.dao.domain.account;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
+import lombok.Singular;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +32,26 @@ public class Account implements Serializable {
   @Column(name = "ACCOUNT_NUMBER", nullable = false, unique = true)
   private Long accountNumber;
 
-  @OneToMany(fetch = FetchType.EAGER)
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
-  private List<Transaction> transactions = new ArrayList<Transaction>();
+  @Singular
+  private List<Transaction> transactions = new ArrayList<>();
+
+  /**
+   * It's not a good design to have account balance as a field in the account table from consistency
+   * and auditing point. Therefore for the same of simplicity it will be calculated on the fly.
+   */
+  @Transient
+  @Setter(AccessLevel.NONE)
+  private BigDecimal accountBalance;
+
+  public BigDecimal getAccountBalance() {
+    return this.transactions.stream()
+        .map(
+            (transaction ->
+                TransactionTypeEnum.DEBIT.equals(transaction.getTransactionType())
+                    ? transaction.getTransactionAmount().negate()
+                    : transaction.getTransactionAmount()))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
 }

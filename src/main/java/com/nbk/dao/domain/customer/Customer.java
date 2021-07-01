@@ -30,7 +30,7 @@ public class Customer implements Serializable {
   @NonNull
   private String surname;
 
-  @OneToMany(fetch = FetchType.EAGER)
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "CUSTOMER_ID")
   private Set<Account> accounts = new HashSet<Account>();
 }

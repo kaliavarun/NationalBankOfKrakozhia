@@ -88,7 +88,7 @@
                 <button @click="resetForm()" class="btn btn-primary">
                   Reset
                 </button>
-                <div class="acc-success">
+                <div class="actionalert">
                   <span v-show="isAccountCreated" class="badge alert-success"
                     >Account Created: {{ accountNumber }}</span
                   >
@@ -156,6 +156,15 @@
                   </button>
                 </div>
                 <!-- Customer Details -->
+                <div class="row">
+                  <div class="actionalert">
+                    <span
+                      v-if="viewDetailsErrorMessage"
+                      class="badge alert-danger"
+                      >{{ viewDetailsErrorMessage }}</span
+                    >
+                  </div>
+                </div>
                 <div v-if="customerDetails">
                   <div class="row">
                     <table
@@ -201,29 +210,29 @@
                   </div>
                   <!-- Customer Account Transaction Details -->
                   <div v-if="transactions">
-                  <div class="row">
-                    <table
-                      class="table table-striped table-hover table-condensed"
-                    >
-                      <thead>
-                        <tr>
-                          <th scope="col">Trans. Id</th>
-                          <th scope="col">Trans. Type</th>
-                          <th scope="col">Trans. Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="(transaction, key) in transactions"
-                          :key="key"
-                        >
-                          <th scope="row">{{ transaction.transactionId }}</th>
-                          <td>{{ transaction.transactionType }}</td>
-                          <td>{{ transaction.transactionAmount }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                    <div class="row">
+                      <table
+                        class="table table-striped table-hover table-condensed"
+                      >
+                        <thead>
+                          <tr>
+                            <th scope="col">Trans. Id</th>
+                            <th scope="col">Trans. Type</th>
+                            <th scope="col">Trans. Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="(transaction, key) in transactions"
+                            :key="key"
+                          >
+                            <th scope="row">{{ transaction.transactionId }}</th>
+                            <td>{{ transaction.transactionType }}</td>
+                            <td>{{ transaction.transactionAmount }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -249,6 +258,7 @@ export default {
       accountNumber: "",
       customerDetails: "",
       transactions: [],
+      viewDetailsErrorMessage: "",
     };
   },
   methods: {
@@ -287,23 +297,32 @@ export default {
         .then((response) => {
           if (response.ok) {
             return response.json();
+          } else if (response.status === 404) {
+            this.resetForm();
+            this.viewDetailsErrorMessage = "Customer not found!";
           } else {
-            throw new Error("Something went wrong");
+            throw new Error(response);
           }
         })
         .then((customerDetails) => {
-          this.customerDetails = customerDetails;
-          console.log(customerDetails)
+          if (customerDetails) {
+            this.customerDetails = customerDetails;
+            this.viewDetailsErrorMessage = "";
+          }
         })
+        // Only occurs in case of network errors
         .catch((error) => {
-          this.customerDetails = "";
-          console.log(error);
+          this.log(error);
+          this.resetForm();
+          this.viewDetailsErrorMessage =
+            "Error !. Please contact Viktor Navorski!" + error.status;
         });
     },
-    onAccountSelect(event){
-      console.log(event.target.value)
-      this.transactions = this.customerDetails.accounts[event.target.value].transactions
-      console.log('Set Trans is' + this.transactions)
+    onAccountSelect(event) {
+      console.log(event.target.value);
+      this.transactions =
+        this.customerDetails.accounts[event.target.value].transactions;
+      console.log("Set Trans is" + this.transactions);
     },
     resetForm() {
       this.customerId = "";
@@ -312,8 +331,12 @@ export default {
       this.selectedAccount = "";
       this.initialCredit = "";
       this.isAccountCreated = false;
-      this.transactions = []
-    }
+      this.transactions = [];
+      this.viewDetailsErrorMessage = "";
+    },
+    log(text) {
+      console.log(text);
+    },
   },
 };
 </script>
@@ -330,8 +353,9 @@ export default {
 .table-condensed {
   font-size: 11px;
 }
-.acc-success {
+.actionalert {
   margin-top: 2rem;
+  text-align: center;
 }
 .btn-group.accountType {
   width: 400px;

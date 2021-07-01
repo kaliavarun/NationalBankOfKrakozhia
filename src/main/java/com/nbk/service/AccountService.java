@@ -52,6 +52,10 @@ public class AccountService {
     return null;
   }
 
+  public Account findAccountsByAccountNumber(@NonNull Long accountNumber) {
+    return accountRepository.findByAccountNumber(accountNumber);
+  }
+
   /**
    * To be generated using database in real
    *

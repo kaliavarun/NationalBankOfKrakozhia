@@ -14,7 +14,6 @@ import javax.transaction.Transactional;
 import java.util.Objects;
 
 @Service
-@Transactional
 public class NationalBankOfKrakozhiaService {
 
   private final CustomerService customerService;
@@ -35,6 +34,7 @@ public class NationalBankOfKrakozhiaService {
    * @param accountDTO dto object to create account
    * @return accountDTO After account creation
    */
+  @Transactional
   public AccountDTO createAccount(@NonNull AccountDTO accountDTO) {
     // 1. Check if valid customer
     this.customerService
@@ -55,9 +55,8 @@ public class NationalBankOfKrakozhiaService {
 
       this.transactionService.createTransaction(transaction);
     }
-
+    //4. Set generated account number to DTO
     accountDTO.setAccountNumber(account.getAccountNumber());
-
     return accountDTO;
   }
 
@@ -67,5 +66,9 @@ public class NationalBankOfKrakozhiaService {
 
   public Customer findCustomerById(Long id) {
     return customerService.findById(id).orElse(null);
+  }
+
+  public Account findAccountByAccountNumber(Long number) {
+    return accountService.findAccountsByAccountNumber(number);
   }
 }
