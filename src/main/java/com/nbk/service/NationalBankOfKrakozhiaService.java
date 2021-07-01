@@ -69,6 +69,7 @@ public class NationalBankOfKrakozhiaService {
   }
 
   public Account findAccountByAccountNumber(Long number) {
-    return accountService.findAccountsByAccountNumber(number);
+    Account account = accountService.findAccountsByAccountNumber(number);
+    return account;
   }
 }

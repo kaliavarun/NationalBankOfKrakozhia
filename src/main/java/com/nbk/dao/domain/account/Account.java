@@ -1,8 +1,7 @@
 package com.nbk.dao.domain.account;
 
-import lombok.AccessLevel;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.Setter;
 import lombok.Singular;
 
 import javax.persistence.*;
@@ -41,17 +40,17 @@ public class Account implements Serializable {
    * It's not a good design to have account balance as a field in the account table from consistency
    * and auditing point. Therefore for the same of simplicity it will be calculated on the fly.
    */
-  @Transient
-  @Setter(AccessLevel.NONE)
-  private BigDecimal accountBalance;
+  @Transient @JsonInclude() private BigDecimal accountBalance;
 
-  public BigDecimal getAccountBalance() {
-    return this.transactions.stream()
-        .map(
-            (transaction ->
-                TransactionTypeEnum.DEBIT.equals(transaction.getTransactionType())
-                    ? transaction.getTransactionAmount().negate()
-                    : transaction.getTransactionAmount()))
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  @PostLoad
+  public void setAccountBalance() {
+    accountBalance =
+        this.transactions.stream()
+            .map(
+                (transaction ->
+                    TransactionTypeEnum.DEBIT.equals(transaction.getTransactionType())
+                        ? transaction.getTransactionAmount().negate()
+                        : transaction.getTransactionAmount()))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 }
