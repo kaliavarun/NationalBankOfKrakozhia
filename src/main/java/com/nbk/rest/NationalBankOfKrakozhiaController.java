@@ -1,8 +1,10 @@
 package com.nbk.rest;
 
 import com.nbk.dao.domain.account.Account;
+import com.nbk.dao.domain.account.Transaction;
 import com.nbk.dao.domain.customer.Customer;
 import com.nbk.dto.AccountDTO;
+import com.nbk.dto.TransactionDTO;
 import com.nbk.service.NationalBankOfKrakozhiaService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Objects;
 
+/** F */
 @RestController
 public class NationalBankOfKrakozhiaController {
 
@@ -29,12 +31,7 @@ public class NationalBankOfKrakozhiaController {
 
   @GetMapping("/customer/{id}")
   public ResponseEntity<Customer> getCustomer(@NonNull @PathVariable("id") Long id) {
-    Customer customer = service.findCustomerById(id);
-    if (Objects.nonNull(customer)) {
-      return ResponseEntity.ok().body(service.findCustomerById(id));
-    } else {
-      return ResponseEntity.notFound().build();
-    }
+    return ResponseEntity.ok().body(service.findCustomerById(id));
   }
 
   @GetMapping("/account/{number}")
@@ -45,5 +42,11 @@ public class NationalBankOfKrakozhiaController {
   @PostMapping("/account/create")
   public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
     return ResponseEntity.ok().body(service.createAccount(accountDTO));
+  }
+
+  @PostMapping("/account/{accountNumber}/transaction/create")
+  public ResponseEntity<Transaction> createTransaction(
+      @RequestBody @Valid TransactionDTO transactionDTO) {
+    return ResponseEntity.ok().body(service.createTransaction(transactionDTO));
   }
 }

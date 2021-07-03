@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ApplicationConfiguration {
-    @Bean
-    public Module datatypeHibernateModule() {
-        return new Hibernate5Module();
-    }
+  @Bean
+  public Module datatypeHibernateModule() {
+    var module = new Hibernate5Module();
+    module.disable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION);
+    return module;
+  }
 }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,11 +24,11 @@ public class Customer implements Serializable {
   private long id;
 
   @Column(name = "CUSTOMER_NAME", nullable = false)
-  @NonNull
+  @NotNull
   private String name;
 
   @Column(name = "CUSTOMER_SURNAME", nullable = false)
-  @NonNull
+  @NotNull
   private String surname;
 
   @OneToMany(fetch = FetchType.LAZY)

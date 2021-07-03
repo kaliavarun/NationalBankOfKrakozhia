@@ -1,6 +1,5 @@
 package com.nbk.dao.domain.account;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.Singular;
 
@@ -31,8 +30,11 @@ public class Account implements Serializable {
   @Column(name = "ACCOUNT_NUMBER", nullable = false, unique = true)
   private Long accountNumber;
 
-  @OneToMany(fetch = FetchType.LAZY)
-  @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
+  @OneToMany(
+      fetch = FetchType.LAZY,
+      mappedBy = "account",
+      orphanRemoval = true,
+      cascade = CascadeType.ALL)
   @Singular
   private List<Transaction> transactions = new ArrayList<>();
 
@@ -40,7 +42,7 @@ public class Account implements Serializable {
    * It's not a good design to have account balance as a field in the account table from consistency
    * and auditing point. Therefore for the same of simplicity it will be calculated on the fly.
    */
-  @Transient @JsonInclude() private BigDecimal accountBalance;
+  @Transient private BigDecimal accountBalance;
 
   @PostLoad
   public void setAccountBalance() {

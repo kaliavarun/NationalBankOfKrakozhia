@@ -17,8 +17,7 @@ import java.util.Random;
 @Transactional
 public class AccountService {
 
-  final long MAX_ACCOUNT_NUMBER_VALUE = 9999999999999999L;
-  final long MIN_ACCOUNT_NUMBER_VALUE = 1000000000000000L;
+  private static final long ACCOUNT_NUMBER_RANGE = 9999999999999999L - 1000000000000000L;
 
   private final AccountRepository accountRepository;
 
@@ -30,7 +29,7 @@ public class AccountService {
   public Account createAccount(@NonNull AccountDTO accountDTO) {
     // Can be replaced with factory pattern if this is a composite service
     // containing other services.
-    Account account = new Account();
+    var account = new Account();
     account.setCustomerId(accountDTO.getCustomerId());
     account.setAccountNumber(accountNumberGenerator());
 
@@ -48,23 +47,16 @@ public class AccountService {
     return accountRepository.save(account);
   }
 
-  public List<Account> findAccountsByCustomerId(@NonNull Long customerId) {
-    return null;
-  }
-
   public Account findAccountsByAccountNumber(@NonNull Long accountNumber) {
     return accountRepository.findByAccountNumber(accountNumber);
   }
 
   /**
-   * To be generated using database in real
+   * In real to be generated based on factors like location, branch, time etc
    *
    * @return Random account number
    */
   private Long accountNumberGenerator() {
-    return Math.abs(
-        Float.valueOf(
-                new Random().nextFloat() * (MAX_ACCOUNT_NUMBER_VALUE - MIN_ACCOUNT_NUMBER_VALUE))
-            .longValue());
+    return Float.valueOf(new Random().nextFloat() * ACCOUNT_NUMBER_RANGE).longValue();
   }
 }

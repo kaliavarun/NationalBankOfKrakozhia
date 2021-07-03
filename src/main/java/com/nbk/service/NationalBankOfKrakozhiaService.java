@@ -5,6 +5,7 @@ import com.nbk.dao.domain.account.Transaction;
 import com.nbk.dao.domain.account.TransactionTypeEnum;
 import com.nbk.dao.domain.customer.Customer;
 import com.nbk.dto.AccountDTO;
+import com.nbk.dto.TransactionDTO;
 import com.nbk.exception.NationalBankOfKrakozhiaException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +43,34 @@ public class NationalBankOfKrakozhiaService {
         .orElseThrow(() -> new NationalBankOfKrakozhiaException("No customer found!"));
 
     // 2. Create account.
-    Account account = this.accountService.createAccount(accountDTO);
+    var account = this.accountService.createAccount(accountDTO);
 
     // 3. Create transaction in new account if initial credit is not null
     if (Objects.nonNull(accountDTO.getInitialCredit())) {
 
-      Transaction transaction = new Transaction();
+      var transaction = new Transaction();
       transaction.setTransactionAmount(accountDTO.getInitialCredit());
       transaction.setTransactionType(
           TransactionTypeEnum.CREDIT); // by default only credit is implemented
-      transaction.setTransactionAccountId(account.getAccountId());
+      transaction.setAccount(account);
 
       this.transactionService.createTransaction(transaction);
     }
-    //4. Set generated account number to DTO
+    // 4. Set generated account number to DTO
     accountDTO.setAccountNumber(account.getAccountNumber());
     return accountDTO;
+  }
+
+  @Transactional
+  public Transaction createTransaction(@NonNull TransactionDTO transactionDTO) {
+    var account = accountService.findAccountsByAccountNumber(transactionDTO.getAccountNumber());
+    if (Objects.isNull(account)) {
+      throw new NationalBankOfKrakozhiaException("Account number doesn't exist");
+    }
+
+    // Trans
+
+    return transactionService.createTransaction(new Transaction());
   }
 
   public Customer createCustomer(@NonNull Customer customer) {
@@ -65,11 +78,12 @@ public class NationalBankOfKrakozhiaService {
   }
 
   public Customer findCustomerById(Long id) {
-    return customerService.findById(id).orElse(null);
+    return customerService
+        .findById(id)
+        .orElseThrow(() -> new NationalBankOfKrakozhiaException("Customer doesn't exist"));
   }
 
   public Account findAccountByAccountNumber(Long number) {
-    Account account = accountService.findAccountsByAccountNumber(number);
-    return account;
+    return accountService.findAccountsByAccountNumber(number);
   }
 }
