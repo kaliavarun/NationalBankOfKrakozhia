@@ -10,10 +10,8 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
-  private Long accountNumber;
-
-  @NotNull private Long customerId;
-  @NotNull private String accountType;
-  private BigDecimal initialCredit;
+public class TransactionDTO {
+  @NotNull private Long accountNumber;
+  @NotNull private BigDecimal transactionAmount;
+  @NotNull private String transactionType;
 }

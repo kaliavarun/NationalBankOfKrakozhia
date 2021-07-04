@@ -1,5 +1,6 @@
 package com.nbk.dao.domain.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,12 +23,14 @@ public class Transaction implements Serializable {
   @Column(name = "TRANSACTION_ID", nullable = false)
   private Long transactionId;
 
-  @Column(name = "TRANSACTION_ACCOUNT_ID", nullable = false)
-  private Long transactionAccountId;
-
   @Column(name = "TRANSACTION_TYPE", nullable = false)
   private TransactionTypeEnum transactionType;
 
   @Column(name = "TRANSACTION_AMMOUNT", nullable = false)
   private BigDecimal transactionAmount;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
+  @JsonIgnore
+  private Account account;
 }
