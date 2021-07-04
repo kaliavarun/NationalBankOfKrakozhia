@@ -214,7 +214,7 @@
                     <div class="valid-feedback">Looks good!</div>
                   </div>
                   <!-- Customer Account Transaction Details -->
-                  <div v-if="selectedAccount.transactions">
+                  <div v-if=" selectedAccount !== '' && selectedAccount.transactions">
                     <div class="row">
                       <table
                         class="table table-striped table-hover table-condensed"
@@ -343,12 +343,9 @@ export default {
         });
     },
     onAccountSelect(event) {
-      console.log(event.target.value);
-      if (event.target.value === 1) {
-        this.selectedAccount = "";
-        console.log('FFFFFFFF')
+      if (event.target.value == 0) {
+        this.selectedAccount = '';
       } else {
-        console.log('AAAAAAAAAAA')
         this.selectedAccount =
           this.customerDetails.accounts[event.target.value -1];
       }

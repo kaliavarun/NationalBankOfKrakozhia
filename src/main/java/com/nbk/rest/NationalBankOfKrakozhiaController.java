@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-/** F */
 @RestController
+@RequestMapping("/api")
 public class NationalBankOfKrakozhiaController {
 
   private final NationalBankOfKrakozhiaService service;
