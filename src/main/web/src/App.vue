@@ -92,6 +92,11 @@
                   <span v-show="isAccountCreated" class="badge alert-success"
                     >Account Created: {{ accountNumber }}</span
                   >
+                  <span
+                    v-show="createAccountErrorMessage"
+                    class="badge alert-danger"
+                    >{{ createAccountErrorMessage }}</span
+                  >
                 </div>
               </div>
             </form>
@@ -194,22 +199,22 @@
                       id="selectAccount"
                       required=""
                     >
+                      <option value="0">--Select Account--</option>
                       <option
                         v-for="(acc, key) in customerDetails.accounts"
-                        :value="key"
+                        :value="key + 1"
                         :key="key"
                       >
                         {{ acc.accountNumber }}
                       </option>
                     </select>
-                    <label for="selectAccount">-Select Account-</label>
                     <div class="invalid-feedback">
                       Please provide a valid value.
                     </div>
                     <div class="valid-feedback">Looks good!</div>
                   </div>
                   <!-- Customer Account Transaction Details -->
-                  <div v-if="transactions">
+                  <div v-if="selectedAccount.transactions">
                     <div class="row">
                       <table
                         class="table table-striped table-hover table-condensed"
@@ -218,12 +223,14 @@
                           <tr>
                             <th scope="col">Trans. Id</th>
                             <th scope="col">Trans. Type</th>
-                            <th scope="col">Trans. Amount</th>
+                            <th scope="col">Trans. Amount(€)</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr
-                            v-for="(transaction, key) in transactions"
+                            v-for="(
+                              transaction, key
+                            ) in selectedAccount.transactions"
                             :key="key"
                           >
                             <th scope="row">{{ transaction.transactionId }}</th>
@@ -232,6 +239,11 @@
                           </tr>
                         </tbody>
                       </table>
+                    </div>
+                    <div class="row">
+                      <div class="alert alert-primary" role="alert">
+                        Account Balance(€):{{ selectedAccount.accountBalance }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -257,7 +269,9 @@ export default {
       isAccountCreated: false,
       accountNumber: "",
       customerDetails: "",
-      transactions: [],
+      isCreateAccountErrorMessage: false,
+      createAccountErrorMessage: "",
+      isViewDetailsErrorMessage: false,
       viewDetailsErrorMessage: "",
     };
   },
@@ -277,15 +291,23 @@ export default {
       })
         .then((response) => {
           if (response.ok) {
+            this.createAccountErrorMessage = "";
             this.isAccountCreated = true;
+            return response.json();
+          } else if (response.status === 400) {
+            this.isAccountCreated = false;
             return response.json();
           } else {
             throw new Error("Something went wrong");
           }
         })
-        .then((account) => {
-          this.accountNumber = account.accountNumber;
-          console.log(account);
+        .then((data) => {
+          if (this.isAccountCreated) {
+            this.accountNumber = data.accountNumber;
+          } else {
+            this.resetForm();
+            this.createAccountErrorMessage = data.errors.join(",");
+          }
         })
         .catch((error) => {
           this.isAccountCreated = false;
@@ -297,22 +319,24 @@ export default {
         .then((response) => {
           if (response.ok) {
             return response.json();
-          } else if (response.status === 404) {
-            this.resetForm();
-            this.viewDetailsErrorMessage = "Customer not found!";
+          } else if (response.status === 404 || response.status === 400) {
+            this.isViewDetailsErrorMessage = true;
+            return response.json();
           } else {
             throw new Error(response);
           }
         })
-        .then((customerDetails) => {
-          if (customerDetails) {
-            this.customerDetails = customerDetails;
+        .then((data) => {
+          if (!this.isViewDetailsErrorMessage) {
+            this.customerDetails = data;
             this.viewDetailsErrorMessage = "";
+          } else {
+            this.resetForm();
+            this.viewDetailsErrorMessage = data.errors.join(",");
           }
         })
         // Only occurs in case of network errors
         .catch((error) => {
-          this.log(error);
           this.resetForm();
           this.viewDetailsErrorMessage =
             "Error !. Please contact Viktor Navorski!" + error.status;
@@ -320,9 +344,14 @@ export default {
     },
     onAccountSelect(event) {
       console.log(event.target.value);
-      this.transactions =
-        this.customerDetails.accounts[event.target.value].transactions;
-      console.log("Set Trans is" + this.transactions);
+      if (event.target.value === 1) {
+        this.selectedAccount = "";
+        console.log('FFFFFFFF')
+      } else {
+        console.log('AAAAAAAAAAA')
+        this.selectedAccount =
+          this.customerDetails.accounts[event.target.value -1];
+      }
     },
     resetForm() {
       this.customerId = "";
@@ -331,8 +360,11 @@ export default {
       this.selectedAccount = "";
       this.initialCredit = "";
       this.isAccountCreated = false;
-      this.transactions = [];
-      this.viewDetailsErrorMessage = "";
+      this.isCreateAccountErrorMessage = false,
+        this.createAccountErrorMessage = "",
+        this.isViewDetailsErrorMessage = false,
+        this.viewDetailsErrorMessage = "";
+        this.customerDetails = '';
     },
     log(text) {
       console.log(text);
