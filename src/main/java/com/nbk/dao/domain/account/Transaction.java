@@ -16,21 +16,21 @@ import java.math.BigDecimal;
 @Table(name = "T_TRANSACTION")
 public class Transaction implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "TRANSACTION_ID", nullable = false)
-  private Long transactionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "TRANSACTION_ID", nullable = false)
+    private Long transactionId;
 
-  @Column(name = "TRANSACTION_TYPE", nullable = false)
-  private TransactionTypeEnum transactionType;
+    @Column(name = "TRANSACTION_TYPE", nullable = false)
+    private TransactionTypeEnum transactionType;
 
-  @Column(name = "TRANSACTION_AMMOUNT", nullable = false)
-  private BigDecimal transactionAmount;
+    @Column(name = "TRANSACTION_AMMOUNT", nullable = false)
+    private BigDecimal transactionAmount;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
-  @JsonIgnore
-  private Account account;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TRANSACTION_ACCOUNT_ID")
+    @JsonIgnore
+    private Account account;
 }

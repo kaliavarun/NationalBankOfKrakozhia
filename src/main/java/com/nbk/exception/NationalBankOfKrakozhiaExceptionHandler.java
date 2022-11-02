@@ -18,30 +18,30 @@ import java.util.List;
 @ControllerAdvice
 public class NationalBankOfKrakozhiaExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler(value = {NationalBankOfKrakozhiaException.class})
-  protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
-    List<String> errors = new ArrayList<>();
-    errors.add(ex.getMessage());
-    var apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-    return handleExceptionInternal(
-        ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-  }
-
-  @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(
-      MethodArgumentNotValidException ex,
-      HttpHeaders headers,
-      HttpStatus status,
-      WebRequest request) {
-    List<String> errors = new ArrayList<>();
-    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-      errors.add(error.getField() + ": " + error.getDefaultMessage());
-    }
-    for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-      errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
+    @ExceptionHandler(value = {NationalBankOfKrakozhiaException.class})
+    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+        var apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return handleExceptionInternal(
+                ex, apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
-    var apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-    return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
-  }
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+        List<String> errors = new ArrayList<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.add(error.getField() + ": " + error.getDefaultMessage());
+        }
+        for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
+        }
+
+        var apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
+        return handleExceptionInternal(ex, apiError, headers, apiError.getStatus(), request);
+    }
 }

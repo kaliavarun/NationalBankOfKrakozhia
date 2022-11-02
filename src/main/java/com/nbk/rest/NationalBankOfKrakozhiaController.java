@@ -17,36 +17,36 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class NationalBankOfKrakozhiaController {
 
-  private final NationalBankOfKrakozhiaService service;
+    private final NationalBankOfKrakozhiaService service;
 
-  @Autowired
-  public NationalBankOfKrakozhiaController(NationalBankOfKrakozhiaService service) {
-    this.service = service;
-  }
+    @Autowired
+    public NationalBankOfKrakozhiaController(NationalBankOfKrakozhiaService service) {
+        this.service = service;
+    }
 
-  @PostMapping("/customer/create")
-  public ResponseEntity<Customer> createCustomer(@RequestBody @NonNull @Valid Customer customer) {
-    return ResponseEntity.ok().body(service.createCustomer(customer));
-  }
+    @PostMapping("/customer/create")
+    public ResponseEntity<Customer> createCustomer(@RequestBody @NonNull @Valid Customer customer) {
+        return ResponseEntity.ok().body(service.createCustomer(customer));
+    }
 
-  @GetMapping("/customer/{id}")
-  public ResponseEntity<Customer> getCustomer(@NonNull @PathVariable("id") Long id) {
-    return ResponseEntity.ok().body(service.findCustomerById(id));
-  }
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<Customer> getCustomer(@NonNull @PathVariable("id") Long id) {
+        return ResponseEntity.ok().body(service.findCustomerById(id));
+    }
 
-  @GetMapping("/account/{number}")
-  public ResponseEntity<Account> getAccount(@NonNull @PathVariable("number") Long number) {
-    return ResponseEntity.ok().body(service.findAccountByAccountNumber(number));
-  }
+    @GetMapping("/account/{number}")
+    public ResponseEntity<Account> getAccount(@NonNull @PathVariable("number") Long number) {
+        return ResponseEntity.ok().body(service.findAccountByAccountNumber(number));
+    }
 
-  @PostMapping("/account/create")
-  public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
-    return ResponseEntity.ok().body(service.createAccount(accountDTO));
-  }
+    @PostMapping("/account/create")
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
+        return ResponseEntity.ok().body(service.createAccount(accountDTO));
+    }
 
-  @PostMapping("/account/{accountNumber}/transaction/create")
-  public ResponseEntity<Transaction> createTransaction(
-      @RequestBody @Valid TransactionDTO transactionDTO) {
-    return ResponseEntity.ok().body(service.createTransaction(transactionDTO));
-  }
+    @PostMapping("/account/{accountNumber}/transaction/create")
+    public ResponseEntity<Transaction> createTransaction(
+            @RequestBody @Valid TransactionDTO transactionDTO) {
+        return ResponseEntity.ok().body(service.createTransaction(transactionDTO));
+    }
 }

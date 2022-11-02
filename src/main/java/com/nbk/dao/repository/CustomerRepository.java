@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-  @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.accounts where c.id = ?1")
-  Optional<Customer> findById(Long id);
+    @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.accounts where c.id = ?1")
+    Optional<Customer> findById(Long id);
 }

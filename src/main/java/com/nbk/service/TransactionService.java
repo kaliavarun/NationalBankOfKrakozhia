@@ -11,14 +11,14 @@ import javax.transaction.Transactional;
 @Transactional
 public class TransactionService {
 
-  private final TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-  @Autowired
-  public TransactionService(TransactionRepository transactionRepository) {
-    this.transactionRepository = transactionRepository;
-  }
+    @Autowired
+    public TransactionService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
-  public Transaction createTransaction(Transaction transaction) {
-    return transactionRepository.save(transaction);
-  }
+    public Transaction createTransaction(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
 }

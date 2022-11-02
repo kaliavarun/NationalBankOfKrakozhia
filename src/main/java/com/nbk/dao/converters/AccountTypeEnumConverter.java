@@ -12,23 +12,23 @@ import java.util.stream.Stream;
 @Converter(autoApply = true)
 public class AccountTypeEnumConverter implements AttributeConverter<AccountTypeEnum, Long> {
 
-  @Override
-  public Long convertToDatabaseColumn(AccountTypeEnum accountTypeEnum) {
-    if (accountTypeEnum == null) {
-      return null;
-    }
-    return accountTypeEnum.getCode();
-  }
-
-  @Override
-  public AccountTypeEnum convertToEntityAttribute(Long code) {
-    if (code == null) {
-      return null;
+    @Override
+    public Long convertToDatabaseColumn(AccountTypeEnum accountTypeEnum) {
+        if (accountTypeEnum == null) {
+            return null;
+        }
+        return accountTypeEnum.getCode();
     }
 
-    return Stream.of(AccountTypeEnum.values())
-        .filter(c -> c.getCode().equals(code))
-        .findFirst()
-        .orElseThrow(IllegalArgumentException::new);
-  }
+    @Override
+    public AccountTypeEnum convertToEntityAttribute(Long code) {
+        if (code == null) {
+            return null;
+        }
+
+        return Stream.of(AccountTypeEnum.values())
+                .filter(c -> c.getCode().equals(code))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
 }

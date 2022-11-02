@@ -11,7 +11,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionDTO {
-  @NotNull private Long accountNumber;
-  @NotNull private BigDecimal transactionAmount;
-  @NotNull private String transactionType;
+    @NotNull
+    private Long accountNumber;
+    @NotNull
+    private BigDecimal transactionAmount;
+    @NotNull
+    private String transactionType;
 }

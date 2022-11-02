@@ -3,6 +3,7 @@
 ![example workflow](https://github.com/kaliavarun/NationalBankOfKrakozhia/actions/workflows/maven.yml/badge.svg)
 
 ## Technical Stack
+
 - Spring Boot 2.5.1
 - Java 11
 - Vue JS
@@ -13,7 +14,8 @@
 
 ## Access
 
-The application has been deployed on Heroku. Since Heroku doesn't support H2 database console, you can only access the console by building the app locally.
+The application has been deployed on Heroku. Since Heroku doesn't support H2 database console, you can only access the
+console by building the app locally.
 
 - https://national-bank-of-krakozhia.herokuapp.com/
 - A following default customer exists with id as following
@@ -22,8 +24,8 @@ The application has been deployed on Heroku. Since Heroku doesn't support H2 dat
     ```
 - Create a new account with this user. You can create multiple accounts and access its details.
 
-
 ## Installation
+
 1. Run maven install
     ```sh
     maven install

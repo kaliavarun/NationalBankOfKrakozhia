@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiError {
-  private HttpStatus status;
-  private String message;
-  private List<String> errors;
+    private HttpStatus status;
+    private String message;
+    private List<String> errors;
 }

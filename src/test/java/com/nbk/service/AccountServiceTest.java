@@ -16,66 +16,65 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 
 class AccountServiceTest {
-  private final AccountRepository repo = mock(AccountRepository.class);
-  private final AccountService service = new AccountService(repo);
+    private static final Long ACCOUNT_ID = 100000L;
+    private static final Long CUSTOMER_ID = 100000L;
+    private final AccountRepository repo = mock(AccountRepository.class);
+    private final AccountService service = new AccountService(repo);
 
-  private static final Long ACCOUNT_ID = 100000L;
-  private static final Long CUSTOMER_ID = 100000L;
+    @BeforeEach
+    void before() {
+        given(repo.save(any(Account.class)))
+                .willAnswer(
+                        (args) -> {
+                            Account account = args.getArgument(0, Account.class);
+                            account.setAccountId(ACCOUNT_ID);
+                            return account;
+                        });
 
-  @BeforeEach
-  void before() {
-    given(repo.save(any(Account.class)))
-        .willAnswer(
-            (args) -> {
-              Account account = args.getArgument(0, Account.class);
-              account.setAccountId(ACCOUNT_ID);
-              return account;
-            });
+        given(repo.findByAccountNumber(any(Long.class)))
+                .willAnswer(
+                        (args) -> {
+                            Long accountNumber = args.getArgument(0, Long.class);
+                            Account account = new Account();
+                            account.setAccountId(ACCOUNT_ID);
+                            account.setAccountNumber(accountNumber);
+                            account.setAccountType(AccountTypeEnum.SAVINGS);
+                            account.setCustomerId(CUSTOMER_ID);
 
-    given(repo.findByAccountNumber(any(Long.class)))
-        .willAnswer(
-            (args) -> {
-              Long accountNumber = args.getArgument(0, Long.class);
-              Account account = new Account();
-              account.setAccountId(ACCOUNT_ID);
-              account.setAccountNumber(accountNumber);
-              account.setAccountType(AccountTypeEnum.SAVINGS);
-              account.setCustomerId(CUSTOMER_ID);
+                            return account;
+                        });
+    }
 
-              return account;
-            });
-  }
+    @ParameterizedTest
+    @ValueSource(strings = {"SAVINGS", "CURRENT"})
+    void test_createAccount_OK(String accountType) {
 
-  @ParameterizedTest
-  @ValueSource(strings = {"SAVINGS", "CURRENT"})
-  void test_createAccount_OK(String accountType) {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAccountType(accountType);
+        accountDTO.setCustomerId(CUSTOMER_ID);
 
-    AccountDTO accountDTO = new AccountDTO();
-    accountDTO.setAccountType(accountType);
-    accountDTO.setCustomerId(CUSTOMER_ID);
+        assertThat(service.createAccount(accountDTO))
+                .hasFieldOrPropertyWithValue("accountId", ACCOUNT_ID)
+                .hasNoNullFieldsOrPropertiesExcept("accountBalance");
+    }
 
-    assertThat(service.createAccount(accountDTO))
-        .hasFieldOrPropertyWithValue("accountId", ACCOUNT_ID)
-        .hasNoNullFieldsOrPropertiesExcept("accountBalance");
-  }
+    @ParameterizedTest
+    @ValueSource(strings = {"XXXXXX"})
+    void test_createAccount_NOK(String accountType) {
 
-  @ParameterizedTest
-  @ValueSource(strings = {"XXXXXX"})
-  void test_createAccount_NOK(String accountType) {
+        AccountDTO accountDTO = new AccountDTO();
+        accountDTO.setAccountType(accountType);
+        accountDTO.setCustomerId(CUSTOMER_ID);
 
-    AccountDTO accountDTO = new AccountDTO();
-    accountDTO.setAccountType(accountType);
-    accountDTO.setCustomerId(CUSTOMER_ID);
+        assertThatThrownBy(() -> service.createAccount(accountDTO))
+                .isInstanceOf(NationalBankOfKrakozhiaException.class)
+                .hasMessage("Invalid Account Type");
+    }
 
-    assertThatThrownBy(() -> service.createAccount(accountDTO))
-        .isInstanceOf(NationalBankOfKrakozhiaException.class)
-        .hasMessage("Invalid Account Type");
-  }
-
-  @ParameterizedTest
-  @ValueSource(longs = {9999999999999999L})
-  void test_findAccountsByAccountNumber_OK(Long accountNumber) {
-    assertThat(service.findAccountsByAccountNumber(accountNumber))
-        .hasFieldOrPropertyWithValue("accountId", ACCOUNT_ID);
-  }
+    @ParameterizedTest
+    @ValueSource(longs = {9999999999999999L})
+    void test_findAccountsByAccountNumber_OK(Long accountNumber) {
+        assertThat(service.findAccountsByAccountNumber(accountNumber))
+                .hasFieldOrPropertyWithValue("accountId", ACCOUNT_ID);
+    }
 }

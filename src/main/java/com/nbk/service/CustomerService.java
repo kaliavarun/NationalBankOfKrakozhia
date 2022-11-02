@@ -13,18 +13,18 @@ import java.util.Optional;
 @Transactional
 public class CustomerService {
 
-  private final CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-  @Autowired
-  public CustomerService(CustomerRepository customerRepository) {
-    this.customerRepository = customerRepository;
-  }
+    @Autowired
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
 
-  public Customer createCustomer(@NonNull Customer customer) {
-    return customerRepository.save(customer);
-  }
+    public Customer createCustomer(@NonNull Customer customer) {
+        return customerRepository.save(customer);
+    }
 
-  public Optional<Customer> findById(@NonNull Long customerId) {
-    return customerRepository.findById(customerId);
-  }
+    public Optional<Customer> findById(@NonNull Long customerId) {
+        return customerRepository.findById(customerId);
+    }
 }
