@@ -6,12 +6,12 @@ import com.nbk.dao.domain.customer.Customer;
 import com.nbk.dto.AccountDTO;
 import com.nbk.dto.TransactionDTO;
 import com.nbk.service.NationalBankOfKrakozhiaService;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")

@@ -28,7 +28,11 @@ console by building the app locally.
 
 1. Run maven install
     ```sh
-    maven install
+    mvn install
+    ```
+    To build native image
+    ```sh
+    mvn spring-boot:build-image -Pnative -DskipTests=true
     ```
 2. Access the UI at
     ```sh
