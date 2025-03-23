@@ -3,7 +3,7 @@ package com.nbk.dao.domain.account;
 import lombok.Data;
 import lombok.Singular;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;

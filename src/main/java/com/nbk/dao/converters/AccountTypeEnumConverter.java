@@ -2,8 +2,9 @@ package com.nbk.dao.converters;
 
 import com.nbk.dao.domain.account.AccountTypeEnum;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+
+import jakarta.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
 import java.util.stream.Stream;
 
 /**
